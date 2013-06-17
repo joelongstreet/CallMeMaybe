@@ -1,0 +1,24 @@
+extends layout
+
+block content
+    .welcome
+        .row-fluid
+            .span4.offset4
+                h1  Welcome Back!
+                form
+                    .control-group
+                        label.control-label Email Address
+                        .controls
+                            .input-prepend
+                                span.add-on
+                                    i.icon-envelope
+                                input.span12#username(type="text")
+                    .control-group
+                        label.control-label Password
+                        .controls
+                            .input-prepend
+                                span.add-on
+                                    i.icon-certificate
+                                input.span12(type="password")
+
+                    a.btn.btn-info.btn-large#login(href='/user/home') Let's Go!

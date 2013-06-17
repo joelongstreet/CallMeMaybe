@@ -1,0 +1,34 @@
+extends layout
+
+block content
+    .welcome
+        .row-fluid
+            .span4.offset4
+                h1 Create your Account
+
+                form
+                    .control-group
+                        label.control-label Enter your Email
+                        .controls
+                            .input-prepend
+                                span.add-on.span3
+                                    i.icon-envelope
+                                input.span12(type="email", autofocus)
+
+                    .control-group
+                        label.control-label Enter your Phone Number
+                        .controls
+                            .input-prepend
+                                span.add-on.span3
+                                    i.icon-user
+                                input.span12(type="text")
+
+                    .control-group
+                        label.control-label Enter a Password
+                        .controls
+                            .input-prepend
+                                span.add-on.span3
+                                    i.icon-certificate
+                                input.span12(type="password")
+
+                    a.btn.btn-info.pull-right(href='/user/home') Let's Go!

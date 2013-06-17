@@ -1,0 +1,60 @@
+extends layout
+
+block content
+
+    .preferences
+        .row-fluid 
+            div &nbsp;
+            .span4
+                .well
+                    h3 Read Recent Emails
+                    a.btn.btn-large.btn-success#callme Call me now
+            .span4
+                .well
+                    h3 Notifications
+                    a#active-mode.btn.btn-large off
+   
+                    .control-group
+                        label.control-label Call me when I receive e-mails from this address...
+                        .controls
+                            .input-prepend
+                                span.add-on
+                                    i.icon-envelope
+                                input.span10#contact(type="text")
+                            a.btn.btn-success#submit-contact
+                                i.icon-ok.icon-white
+                    .control-group
+                        label.control-label Call me when I receive e-mails with this subject:
+                        .controls
+                            .input-prepend
+                                span.add-on
+                                    i.icon-flag
+                                input.span10#subject(type="text") 
+                            a.btn.btn-success#submit-subject
+                                i.icon-ok.icon-white  
+
+                    a.btn.btn-info.btn-large#delete Delete tags 
+              .span3
+                .well
+                    h3 Carly Mode
+                    a#carly-mode.btn.btn-large off               
+
+        #helper
+            #thoughts
+                span You added the tags: 
+                ul.unstyled
+            #concerts
+                span.title Upcoming Concerts:
+                span.concerts 
+                    ul
+                        - each item in carlieInfo.Events
+                            li
+                                = item.Venue.Name
+                                in
+                                = item.Venue.City
+                                , 
+                                = item.Venue.State
+                                &nbsp;
+                                a.btn.btn-info.btn-mini(href="= item.TicketUrl") Buy Tickets!
+
+

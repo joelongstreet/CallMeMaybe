@@ -1,0 +1,19 @@
+doctype 5
+html
+  head
+    title= title
+    link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Clicker+Script|Raleway:400,200,700')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
+    link(rel='stylesheet', href='/stylesheets/bootstrap-responsive.min.css')
+    meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1')
+    script(src='http://code.jquery.com/jquery-2.0.2.min.js')
+    script(src='/js/bootstrap.min.js')
+    script(src='/js/functionality.js')
+  body
+    .header
+        .container
+            a.logo(href='/user/home') 
+            span    Your email will call you, maybe.
+    .container
+        block content
