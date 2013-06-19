@@ -3,6 +3,7 @@ var twilioSession = require('../controllers/session');
 var _ = require('underscore');
 var request = require('request');
 var passport = require('passport');
+var db = require('../config/dbschema');
 
 //fake a user login, just uses phone number - no password
 exports.fakeLogin = function(req, res) {
@@ -61,14 +62,33 @@ exports.list = function(req, res){
 };
 
 exports.newuser = function(req, res){  
-    res.render('createuser', { title: 'New user for call me... maybe?' });
+  res.render('createuser', { title: 'New user for call me... maybe?' });
 };
+
+exports.postnewuser = function(req, res) {
+  console.log(req);
+  var account = new db.userModel({ 
+    email: req.body.email
+    , password: req.body.password
+    , phone: req.body.phone 
+  });
+
+  account.save(function(err) {
+    if(err) {
+      console.log('Error: ' + err);
+    } else {
+      console.log('saved user: ' + account.email);
+    }
+  });
+  return res.redirect('login');
+}
 
 exports.login = function(req, res){  
     res.render('login', { title: 'Log in' });
 };
 
-exports.home = function(req, res){  
+exports.home = function(req, res){ 
+  console.log(req.user);
   request('http://api.jambase.com/events?artistId=50077&page=0&api_key=TFT7JTWUN9C22H4VFZSBYBUQ', function(err, r, body){
     if(body.indexOf('403 Developer Over Rate') != -1){
       res.render('home', { title: 'My Preferences',  carlieInfo : { Events : []}});
@@ -83,41 +103,22 @@ exports.getlogin = function(req, res) {
   res.render('login', { user: req.user, message: req.session.messages });
 };
 
-
-// POST /login
-//   Use passport.authenticate() as route middleware to authenticate the
-//   request.  If authentication fails, the user will be redirected back to the
-//   login page.  Otherwise, the primary route function function will be called,
-//   which, in this example, will redirect the user to the home page.
-//
-//   curl -v -d "username=bob&password=secret" http://127.0.0.1:3000/login
-//   
-/***** This version has a problem with flash messages
-app.post('/login', 
-  passport.authenticate('local', { failureRedirect: '/login', failureFlash: true }),
-  function(req, res) {
-    res.redirect('/');
-  });
-*/
-  
-// POST /login
-//   This is an alternative implementation that uses a custom callback to
-//   acheive the same functionality.
 exports.postlogin = function(req, res, next) {
   passport.authenticate('local', function(err, user, info) {
     if (err) { return next(err) }
     if (!user) {
       req.session.messages =  [info.message];
-      return res.redirect('/postlogin1')
+      console.log(info.message);
+      return res.redirect('/login')
     }
     req.logIn(user, function(err) {
       if (err) { return next(err); }
-      return res.redirect('/');
+      return res.redirect('/user/home');
     });
   })(req, res, next);
 };
 
 exports.logout = function(req, res) {
   req.logout();
-  res.redirect('/');
+  res.redirect('/login');
 };

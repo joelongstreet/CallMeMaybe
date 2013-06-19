@@ -4,11 +4,7 @@ var mongoose = require('mongoose'),
 exports.mongoose = mongoose;
 
 // Database connect
-var uristring = 
-  process.env.MONGOLAB_URI || 
-  process.env.MONGOHQ_URL || 
-  'mongodb://localhost/test';
-
+var uristring = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost/test';
 var mongoOptions = { db: { safe: true }};
 
 mongoose.connect(uristring, mongoOptions, function (err, res) {
@@ -25,7 +21,6 @@ var Schema = mongoose.Schema,
 
 // User schema
 var userSchema = new Schema({
-  username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true},
   phone: {type: String, required: true}

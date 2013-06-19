@@ -4,20 +4,20 @@ block content
     .welcome
         .row-fluid
             .span4.offset4
-                h1  Welcome Back!
-                form(action="/postlogin1")(method="post")
+                form(action="/login", method="post")
                     .control-group
-                        label.control-label Username
                         .controls
                             .input-prepend
                                 span.add-on
                                     i.icon-envelope
-                                input.span12#username(type="text")
+                                input.span12#username(type="text", name="username", placeholder="E-mail address")
                     .control-group
-                        label.control-label Password
                         .controls
                             .input-prepend
                                 span.add-on
                                     i.icon-certificate
-                                input.span12#password(type="password")
-                    input(type="submit")
+                                input.span12#password(type="password", name="password", placeholder="Password")
+                    .control-group
+                      input(type="submit")
+                    .control-group
+                      a.create-account(href='/user/create') Create account

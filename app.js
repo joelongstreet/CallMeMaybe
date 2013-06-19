@@ -61,12 +61,15 @@ if ('development' == app.get('env')) {
   });
 
 // Users
-  app.get('/users', user.list);
-  app.get('/user/create', user.newuser);
-  app.get('/user/login', user.login);
-  app.get('/user/home', user.home);
-app.get('/postlogin1', user.login);
-app.post('/postlogin1', user.postlogin);
+app.get('/users', user.list);
+app.post('/user/create', user.postnewuser);
+app.get('/user/create', user.newuser);
+app.get('/user/login', user.login);
+app.get('/user/home', pass.ensureAuthenticated, user.home);
+app.post('/login', user.postlogin);  
+app.get('/login', user.login);
+app.get('/logout', user.logout);
+
 
 // Voice
   app.all('/voice', function(req,res){ voice.gotoRoute.call(voice, req, res); });
