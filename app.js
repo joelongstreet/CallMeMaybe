@@ -17,10 +17,13 @@ var express = require('express')
   , Voice = require('./routes/voice')
   , http = require('http')
   , path = require('path')
-  , mailbox = require('./routes/mailbox');
+  , mailbox = require('./routes/mailbox')
+  , db = require('./config/dbschema')
+  , pass = require('./config/pass')
+  , passport = require('passport');
 var voice = new Voice({
-      persona: { gender: 'male', language: 'en-gb' }
-    });
+  persona: { gender: 'male', language: 'en-gb' }
+});
 var app = express();
 
 // all environments
@@ -33,8 +36,10 @@ app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(express.cookieParser());
 app.use(express.session({secret: '1234567890QWERTY'}));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(app.router);
-  app.use(require('stylus').middleware(__dirname + '/public'));
+app.use(require('stylus').middleware(__dirname + '/public'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // development only
@@ -42,7 +47,7 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.get('/login/:id', user.fakeLogin);
+//app.get('/login/:id', user.fakeLogin);
 
 // Utils
   app.get('/', routes.index);
@@ -56,10 +61,15 @@ app.get('/login/:id', user.fakeLogin);
   });
 
 // Users
-  app.get('/users', user.list);
-  app.get('/user/create', user.newuser);
-  app.get('/user/login', user.login);
-  app.get('/user/home', user.home);
+app.get('/users', user.list);
+app.post('/user/create', user.postnewuser);
+app.get('/user/create', user.newuser);
+app.get('/user/login', user.login);
+app.get('/user/home', pass.ensureAuthenticated, user.home);
+app.post('/login', user.postlogin);  
+app.get('/login', user.login);
+app.get('/logout', user.logout);
+
 
 // Voice
   app.all('/voice', function(req,res){ voice.gotoRoute.call(voice, req, res); });

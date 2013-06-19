@@ -1,7 +1,9 @@
 var appAccounts = require('../data/store.js').appAccounts;
 var twilioSession = require('../controllers/session');
-var _           = require('underscore');
-var request     = require('request');
+var _ = require('underscore');
+var request = require('request');
+var passport = require('passport');
+var db = require('../config/dbschema');
 
 //fake a user login, just uses phone number - no password
 exports.fakeLogin = function(req, res) {
@@ -60,14 +62,33 @@ exports.list = function(req, res){
 };
 
 exports.newuser = function(req, res){  
-    res.render('createuser', { title: 'New user for call me... maybe?' });
+  res.render('createuser', { title: 'New user for call me... maybe?' });
 };
+
+exports.postnewuser = function(req, res) {
+  console.log(req);
+  var account = new db.userModel({ 
+    email: req.body.email
+    , password: req.body.password
+    , phone: req.body.phone 
+  });
+
+  account.save(function(err) {
+    if(err) {
+      console.log('Error: ' + err);
+    } else {
+      console.log('saved user: ' + account.email);
+    }
+  });
+  return res.redirect('login');
+}
 
 exports.login = function(req, res){  
     res.render('login', { title: 'Log in' });
 };
 
-exports.home = function(req, res){  
+exports.home = function(req, res){ 
+  console.log(req.user);
   request('http://api.jambase.com/events?artistId=50077&page=0&api_key=TFT7JTWUN9C22H4VFZSBYBUQ', function(err, r, body){
     if(body.indexOf('403 Developer Over Rate') != -1){
       res.render('home', { title: 'My Preferences',  carlieInfo : { Events : []}});
@@ -76,4 +97,28 @@ exports.home = function(req, res){
     }
     
   });
+};
+
+exports.getlogin = function(req, res) {
+  res.render('login', { user: req.user, message: req.session.messages });
+};
+
+exports.postlogin = function(req, res, next) {
+  passport.authenticate('local', function(err, user, info) {
+    if (err) { return next(err) }
+    if (!user) {
+      req.session.messages =  [info.message];
+      console.log(info.message);
+      return res.redirect('/login')
+    }
+    req.logIn(user, function(err) {
+      if (err) { return next(err); }
+      return res.redirect('/user/home');
+    });
+  })(req, res, next);
+};
+
+exports.logout = function(req, res) {
+  req.logout();
+  res.redirect('/login');
 };
