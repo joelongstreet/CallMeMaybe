@@ -5,9 +5,9 @@ block content
         .row-fluid
             .span4.offset4
                 h1  Welcome Back!
-                form
+                form(action="/postlogin1")(method="post")
                     .control-group
-                        label.control-label Email Address
+                        label.control-label Username
                         .controls
                             .input-prepend
                                 span.add-on
@@ -19,6 +19,5 @@ block content
                             .input-prepend
                                 span.add-on
                                     i.icon-certificate
-                                input.span12(type="password")
-
-                    a.btn.btn-info.btn-large#login(href='/user/home') Let's Go!
+                                input.span12#password(type="password")
+                    input(type="submit")
