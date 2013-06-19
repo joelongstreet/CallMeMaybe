@@ -1,0 +1,27 @@
+doctype 5
+html
+  head
+    title= title
+    meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1')
+    link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Clicker+Script|Raleway:400,200,700')
+    | !{assets.css()}
+
+    script(src='//code.jquery.com/jquery-2.0.2.min.js')
+  body
+    .header
+        .container
+            -if(session.user)
+                a.logo(href='/home') 
+            -else
+                a.logo(href='/') 
+            span    Your email will call you, maybe.
+    .container
+        block content
+    
+    - if(session.user)
+        .footer
+            .container
+                a.logout.pull-right(href="/logout") Logout from #{session.user.email}
+
+    | !{assets.templateLibrary()}
+    | !{assets.js()}

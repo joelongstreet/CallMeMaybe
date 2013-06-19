@@ -1,0 +1,47 @@
+extends ../layout
+
+block content
+    .row-fluid
+        .span12
+            h1 Learn How to Use App
+            h2 Check out all the available options below
+            .navbar
+                .navbar-inner
+                    ul.nav
+                        li
+                            a(href="#listen-actions") listen actions
+                        li
+                            a(href="#item-actions") item actions
+                        li
+                            a(href="#listing-commands") listing commands
+
+
+            div#listen-actions
+                h2 Listen Actions
+
+                ul
+                    li start
+                    li pause
+                    li skip
+                    li next
+                    li previous
+                    li restart
+
+            div#item-actions
+                h2 Item Actions
+
+                ul
+                    li reply
+                    li forward
+                    li archive
+                    li delete
+
+            div#listing-commands
+                h2 Item Actions
+
+                ul
+                    li Show me new emails [ in <folder> ]
+                    li Show me all emails [ in <folder> ]
+                    li Show me the last x emails [from y]
+                    li Readme <subjects> from <folder>
+

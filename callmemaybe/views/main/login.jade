@@ -1,0 +1,29 @@
+extends ../layout
+
+block content
+    .welcome
+        .row-fluid
+            .span4.offset4
+                h1  Welcome Back!
+
+                - if (typeof flash != 'undefined' && flash.notice)
+                    div.alert
+                      button.close( type="button", data-dismiss="alert") &times;
+                      =flash.notice
+
+                form#loginForm(action="/loginAction", method="POST")
+                    .control-group
+                        label.control-label Email Address
+                        .controls
+                            .input-prepend
+                                span.add-on
+                                    i.icon-envelope
+                                input#email.span12(value="ruzz311@gmail.com", name="email", type="email", placeholder="email", required, autofocus)
+                    .control-group
+                        label.control-label Password
+                        .controls
+                            .input-prepend
+                                span.add-on
+                                    i.icon-certificate
+                                input#password.span12(type="password", name="password", required)
+                    button.btn.btn-info.btn-large#login(type="submit") Let's Go!

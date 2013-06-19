@@ -1,0 +1,57 @@
+extends ../layout
+
+block body
+    h1 Code Chat
+
+    div
+        h3 Login
+        input#loginName(type="text", placeholder="name")
+        input#loginPassword(type="password", placeholder="password")
+        button#loginButton Login
+
+    div
+        h3 Signup
+        input#signupName(type="text", placeholder="name")
+        input#signupPassword(type="password", placeholder="password")
+        input#signupConfirmPassword( type="password", placeholder="confirm password")
+        button#signupButton Signup
+
+    script
+        $(function(){
+
+            function signupHandler(){
+                var username = $("#signupName").val();
+                var password = $("#signupPassword").val();
+                var confirmPassword = $("#signupConfirmPassword").val();
+                if (username && password) {
+                    if (password === confirmPassword) {
+                        $.post('/signup', {username: username, password:password}, function () {
+                            window.location = "/config";
+                        }).fail(function(res){
+                            alert("Error: " + res.getResponseHeader("error"));
+                        });
+                    } else {
+                        alert("Passwords don't match");
+                    }   
+                } else {
+                    alert("A username and password is required");
+                }
+            }
+
+            function loginHandler(){
+                var username = $("#loginName").val();
+                var password = $("#loginPassword").val();
+                if (username && password) {
+                    $.post('/login', {username: username, password:password}, function () {
+                        window.location = "/config";
+                    }).fail(function(res){
+                        alert("Error: " + res.getResponseHeader("error"));
+                    });
+                } else {
+                    alert("A username and password is required");
+                }
+            }
+
+            $("#loginButton").click(loginHandler);
+            $("#signupButton").click(signupHandler); 
+        });
