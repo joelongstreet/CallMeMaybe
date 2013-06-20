@@ -1,10 +1,10 @@
 //modules
-var appAccounts = require('../data/store.js').appAccounts;
 var twilio  = require('twilio');
 var contextio = require('contextio');
 var twilioSession = require('../controllers/session');
 var textExtract = require('../controllers/text-extract.js');
-var _           = require('underscore');
+var _ = require('underscore');
+var db = require('../config/dbschema');
 
 //variables
 var contextAPIKey = process.env.contextAPIKey;
@@ -32,13 +32,7 @@ exports.call = function(req, res) {
 exports.message = function(req, res) {
   sess = req.sess;
   var opts = {limit:1, include_body:1, folder:'INBOX'};
-  var accountId = null;
-  console.log(sess);
-  if(typeof(sess) == undefined || typeof(sess) == 'undefined'){
-    sess = _.findWhere(appAccounts, { contextioMailboxId : req.query.accountId });
-    accountId = req.query.accountId;
-    console.log(sess);
-  }
+  var accountId = req.sess.accountId;
 
   if (req.params.messageid) { //if a messageid param was passed...
     contextClient.accounts(accountId).messages(req.params.messageid).get(opts, function(err, response) {
@@ -105,10 +99,38 @@ var createDocument = function(message, redirect, res, req) {
   });
 }
 
-  /* this is supposed to give me unread counts but isn't.  come back later
-  contextClient.accounts(contextMailboxId).sources('0').folders().messages().get({include_extended_counts:1}, function (err, res) {
-    console.log(res);
-    console.log(err);
-  });
-  */
+/* this is supposed to give me unread counts but isn't.  come back later
+contextClient.accounts(contextMailboxId).sources('0').folders().messages().get({include_extended_counts:1}, function (err, res) {
+  console.log(res);
+  console.log(err);
+});
+*/
 
+//connect a contextio acccount to a user account
+exports.connect = function(req, res) {
+  if (!req.query.contextio_token) {
+    var opts = {
+      callback_url: 'http://' + req.headers.host + '/user/connect', 
+      email: req.user.email, 
+      source_sync_flags: 1
+    }
+    contextClient.connectTokens().post(opts, function(err, response) {
+      if (err) throw err;
+      res.render('connect', { user: req.user, connectLink: response.body.browser_redirect_url });
+    });
+  }
+  else {
+    contextClient.connectTokens(req.query.contextio_token).get(function(err, response) {
+      if (err) throw err; 
+      if (response.body.account.id) {
+        db.userModel.update({ email: req.user.email }, { contextioAccountId: response.body.account.id }, { multi: false }, function (err, numberAffected, raw) {
+          if (err) return handleError(err);
+          console.log('The number of updated documents was %d', numberAffected);
+          console.log('The raw response from Mongo was ', raw);
+        });
+      }
+      
+      res.redirect('/');
+    });
+  }
+}

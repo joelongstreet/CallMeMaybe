@@ -12,7 +12,7 @@ try {
 var express = require('express')
   , routes = require('./routes')
   , hooks = require('./routes/hooks')
-  , user = require('./routes/user')
+  , userRoutes = require('./routes/user')
   , utils = require('./routes/utils')
   , Voice = require('./routes/voice')
   , http = require('http')
@@ -47,28 +47,25 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-//app.get('/login/:id', user.fakeLogin);
-
 // Utils
-  app.get('/', routes.index);
-  app.get('/faq', utils.faq);
-  app.get('/callme', utils.callme);
-  app.get('/error', function(req, res){
-    console.log('error');
-  });
-  app.post('/error', function(req, res){
-    console.log('error');
-  });
+app.get('/', pass.ensureAuthenticated, userRoutes.home);
 
-// Users
-app.get('/users', user.list);
-app.post('/user/create', user.postnewuser);
-app.get('/user/create', user.newuser);
-app.get('/user/login', user.login);
-app.get('/user/home', pass.ensureAuthenticated, user.home);
-app.post('/login', user.postlogin);  
-app.get('/login', user.login);
-app.get('/logout', user.logout);
+app.get('/faq', utils.faq);
+app.get('/callme', utils.callme);
+app.get('/error', function(req, res){
+  console.log('error');
+});
+app.post('/error', function(req, res){
+  console.log('error');
+});
+
+// User
+app.post('/user/create', userRoutes.postnewuser);
+app.get('/user/create', userRoutes.getnewuser);
+app.get('/user/connect', pass.ensureAuthenticated, mailbox.connect);
+app.post('/login', userRoutes.postlogin);  
+app.get('/login', userRoutes.getlogin);
+app.get('/logout', userRoutes.logout);
 
 
 // Voice
@@ -76,23 +73,23 @@ app.get('/logout', user.logout);
   app.all('/voice/*', function(req,res){ voice.gotoRoute.call(voice, req, res); });
 
 // Returns latest message in your inbox
-  app.post('/message', user.getSession, mailbox.message);
-  app.get('/message', user.getSession, mailbox.message);
+  app.post('/message', userRoutes.userSession, mailbox.message);
+  app.get('/message', userRoutes.userSession, mailbox.message);
 
 // Get Message by id
   app.post('/message/id/:messageid', mailbox.message);
   app.get('/message/id/:messageid', mailbox.message);
 
 // Get the next message  
-  app.post('/message/next', user.getSession, mailbox.nextmessage);
-  app.get('/message/next', user.getSession, mailbox.nextmessage);
+  app.post('/message/next', userRoutes.userSession, mailbox.nextmessage);
+  app.get('/message/next', userRoutes.userSession, mailbox.nextmessage);
 
 // Call a phone number and read a message
-  app.get('/call', user.getSession, mailbox.call);
+  app.get('/call', userRoutes.userSession, mailbox.call);
 
 // Context Web Hooks
-  app.get('/hook/create', user.getSession, hooks.create);
-  app.get('/hook/delete/:hookId', user.getSession, hooks.deleteMe);
+  app.get('/hook/create', userRoutes.userSession, hooks.create);
+  app.get('/hook/delete/:hookId', userRoutes.userSession, hooks.deleteMe);
   app.post('/hook/reveal', hooks.reveal);
 
 http.createServer(app).listen(app.get('port'), function(){
