@@ -70,7 +70,6 @@ exports.postlogin = function(req, res, next) {
 //invalidate current user session
 exports.logout = function(req, res) {
   req.logout();
-  req.sess = null;
   res.redirect('/login');
 };
 
@@ -78,9 +77,9 @@ exports.logout = function(req, res) {
 exports.userSession = function(req, res, next) {
   //see if we already have a twilio phone session created
   try {
-    var sess = twilioSession.getByCallSid(req.body.CallSid);
-    if (typeof sess.accountId !== 'undefined' && sess.accountId !== null) {
-      req.sess = sess;
+    var userSession = twilioSession.getByCallSid(req.body.CallSid);
+    if (typeof userSession.accountId !== 'undefined' && userSession.accountId !== null) {
+      req.session.userSession = userSession;
       next();
     }
   }
@@ -91,7 +90,7 @@ exports.userSession = function(req, res, next) {
     if (typeof req.session.user == 'undefined' || req.session.user == null) {
       req.session.user = {phone:req.user.phone, accountId:req.user.contextioAccountId, currentMessage:0};
     }
-    req.sess = req.session.user;
+    req.session.userSession = req.session.user;
     next();
   }
   catch (e) {}
@@ -107,7 +106,7 @@ exports.userSession = function(req, res, next) {
       var account = db.users.find({phone:req.body.From.replace('+','')});
       if (typeof account !== 'undefined' && account !== null) {
         twilioSession.create({callSid: req.body.CallSid, accountId: appAccount.contextioMailboxId});
-        req.sess = twilioSession.getByCallSid(req.body.CallSid);
+        req.session.userSession = twilioSession.getByCallSid(req.body.CallSid);
         next();
       }
     }

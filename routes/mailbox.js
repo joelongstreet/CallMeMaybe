@@ -18,21 +18,20 @@ var twilioClient  = new twilio.RestClient(twilioAPIKey, twilioAPIToken);
 
 //call a specified number and read latest emails from associated mailbox
 exports.call = function(req, res) {
-  twilioClient.makeCall({to:'+'+req.sess.phone, from:twilioFrom, url:'http://' + req.host + '/message/next'}, function(err, call) {
+  twilioClient.makeCall({to:'+'+req.session.userSession.phone, from:twilioFrom, url:'http://' + req.host + '/message/next'}, function(err, call) {
     if (err) console.log(err);    
     console.log('This call\'s unique ID is: ' + call.sid);
     console.log('This call was created at: ' + call.dateCreated);
 
-    twilioSession.create({callSid: call.sid, accountId:req.sess.accountId});
+    twilioSession.create({callSid: call.sid, accountId:req.session.userSession.accountId});
   });
-  res.end('calling out to ' + req.sess.phone + '...');
+  res.end('calling out to ' + req.session.userSession.phone + '...');
 };
 
 //build and return a twiml of an email message
 exports.message = function(req, res) {
-  sess = req.sess;
   var opts = {limit:1, include_body:1, folder:'INBOX'};
-  var accountId = req.sess.accountId;
+  var accountId = req.session.userSession.accountId;
 
   if (req.params.messageid) { //if a messageid param was passed...
     contextClient.accounts(accountId).messages(req.params.messageid).get(opts, function(err, response) {
@@ -50,12 +49,10 @@ exports.message = function(req, res) {
 
 //build and return the next email message. "next" is determined by the currentMessage index of the call twilioSession
 exports.nextmessage = function(req, res) {
-  var sess = req.sess;
-  console.log(req.sess);
   var opts = {limit:1, offset:0, include_body:1, folder:'INBOX'};
-  var accountId = sess.accountId;
-  opts.offset = sess.currentMessage;
-  sess.currentMessage++;
+  var accountId = req.session.userSession.accountId;
+  opts.offset = req.session.userSession.currentMessage;
+  req.session.userSession.currentMessage++;
   contextClient.accounts(accountId).messages().get(opts, function(err, response) {
     if (err) throw err;
     createDocument(response.body[0], 'http://' + req.host + '/message/next', res, req);  
